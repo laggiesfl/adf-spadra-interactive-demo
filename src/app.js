@@ -6,6 +6,7 @@ import { validateJoin } from './forms.js';
 import { validateResourceMetadata, validateUploadDescriptor, mergeResources } from './resource-contract.js';
 import { createResourceApi } from './resource-api.js';
 import { bindBackToTop } from './back-to-top.js';
+import { navigateToHash } from './hash-navigation.js';
 import { gradeKnowledgeCheck } from './learning.js';
 import { t } from './i18n.js';
 import { WALKTHROUGH_STEPS, boundedStep } from './walkthrough.js';
@@ -139,7 +140,8 @@ function initialise() {
   $('#reset-demo').addEventListener('click', () => { if (!confirm('Reset display preferences and browser-only learning progress? Persistent resources will not be deleted.')) return; store.reset(); policies = [...DEMO_DATA.policies]; resources = mergeResources(DEMO_DATA.resources,liveResources); initialiseOptions(); renderStats(); renderLearning(); syncPreferences(store.getState(), true); $('#staff-status').textContent = 'Browser-only preferences and learning progress reset. Persistent resources were preserved.'; $('#walkthrough-open').textContent = 'Start guided demonstration'; });
   syncPreferences(store.getState());
   resourceApi.session().then(async session=>{showStaffState(session);if(session.authenticated)await refreshStaff()}).catch(()=>showStaffState({authenticated:false}));loadLiveResources();
+  requestAnimationFrame(() => requestAnimationFrame(() => navigateToHash(document, location.hash)));
+  window.addEventListener('hashchange', () => navigateToHash(document, location.hash));
 }
 
 initialise();
-
