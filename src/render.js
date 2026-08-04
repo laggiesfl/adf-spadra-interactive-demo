@@ -37,11 +37,18 @@ export function renderResources(container, records, lowBandwidth = false) {
   const visible = lowBandwidth ? records.slice(0, 4) : records;
   container.replaceChildren(...visible.map(record => {
     const card = element('article');
+    if (record.persistent) card.classList.add('persistent-resource');
     card.append(element('p', 'meta', `${record.country} • ${record.topic} • ${record.language} • ${record.format}`), element('h3', '', record.title), element('p', '', record.summary), element('p', '', `Accessibility: ${record.accessibility}`));
-    if (record.demonstration) card.prepend(element('strong', 'status', 'Added in this demonstration'));
-    const button = element('button', 'text-button', 'View lightweight preview');
-    button.addEventListener('click', () => { button.insertAdjacentElement('afterend', element('div', 'resource-preview', 'Text-first preview loaded on request. In production, this area would provide the accessible resource, format information and download size.')); button.remove(); });
-    card.append(button); return card;
+    card.prepend(element('strong', 'content-label', record.persistent ? 'Published demonstration resource' : 'Illustrative demonstration content'));
+    if (record.persistent && record.downloadUrl) {
+      const meta=element('p','file-meta',`${record.fileName || 'Resource file'}${record.fileSize ? ` • ${Math.ceil(record.fileSize/1024)} KB` : ''}${record.updated ? ` • Updated ${record.updated}` : ''}`);
+      const link=element('a','button',`Download ${record.title}`); link.href=record.downloadUrl; card.append(meta,link);
+    } else {
+      const button = element('button', 'text-button', 'View lightweight preview');
+      button.addEventListener('click', () => { button.insertAdjacentElement('afterend', element('div', 'resource-preview', 'Text-first illustrative preview loaded on request. No official ADF file is attached to this sample record.')); button.remove(); });
+      card.append(button);
+    }
+    return card;
   }));
   if (!records.length) container.append(element('p', 'note', 'No resources match these filters. Clear the filters or try another term.'));
 }
@@ -58,3 +65,4 @@ export function showErrors(summary, form, errors) {
   });
   summary.append(list); summary.hidden = false; summary.focus();
 }
+
