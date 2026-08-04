@@ -1,0 +1,14 @@
+{
+  "name": "adf-spadra-interactive-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "check:budget": "node scripts/check-budget.mjs",
+    "verify": "npm test && npm run check:budget"
+  },
+  "devDependencies": {
+    "netlify-cli": "^27.0.2"
+  }
+}
