@@ -6,9 +6,14 @@
   "scripts": {
     "test": "node --test",
     "check:budget": "node scripts/check-budget.mjs",
-    "verify": "npm test && npm run check:budget"
+    "verify": "npm test && npm run check:budget",
+    "create:password-hash": "node scripts/create-password-hash.mjs"
   },
   "devDependencies": {
     "netlify-cli": "^27.0.2"
+  },
+  "dependencies": {
+    "busboy": "1.6.0"
   }
 }
+
