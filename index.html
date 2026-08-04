@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-language="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive demonstration of the proposed SPADRA online platform for the African Disability Forum.">
+  <title>SPADRA Interactive Demonstration | African Disability Forum</title>
+  <link rel="stylesheet" href="assets/styles.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="demo-notice" role="note"><strong>Interactive concept demonstration:</strong> All records are illustrative and are not official ADF reporting data.</div>
+  <header class="site-header">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">ADF</span><span>African Disability Forum<br><strong>SPADRA Online Hub</strong></span></div>
+    <button id="menu-button" class="menu-button" aria-expanded="false" aria-controls="primary-nav">Menu</button>
+    <nav id="primary-nav" aria-label="Primary navigation">
+      <a href="#overview">Overview</a><a href="#countries">Countries</a><a href="#tracker">Policy tracker</a><a href="#knowledge">Knowledge Hub</a><a href="#learning">Learning</a><a href="#participate">Join us</a>
+    </nav>
+    <div class="header-actions">
+      <button id="walkthrough-open" class="button button-primary">Start guided demonstration</button>
+      <button id="settings-open" class="button">Accessibility settings</button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section id="overview" class="hero" aria-labelledby="overview-heading">
+      <div><p class="eyebrow">Strengthening Partnerships to Advance Disability Rights in Africa</p><h1 id="overview-heading">Evidence. Partnership. Disability rights.</h1><p class="lead">A proposed accessible digital hub connecting policy progress, country milestones, learning and shared resources across Ghana, Benin, Malawi and Zambia.</p><div class="action-row"><a class="button button-primary" href="#tracker">Explore the policy tracker</a><button class="button" id="bandwidth-quick">Turn on low-bandwidth mode</button></div></div>
+      <aside class="hero-panel" aria-labelledby="demo-tools-heading"><h2 id="demo-tools-heading">Demonstration tools</h2><ul><li>Five-to-seven-minute guided walkthrough</li><li>Working search, filters and staff simulation</li><li>Visible low-bandwidth comparison</li><li>English and French interface preview</li></ul><button id="reset-demo" class="text-button">Reset all demonstration data</button></aside>
+    </section>
+
+    <section id="countries" aria-labelledby="countries-heading"><p class="eyebrow">Country explorer</p><h2 id="countries-heading">Progress across four countries</h2><div id="country-grid" class="card-grid"></div><div id="country-detail" class="detail-panel" tabindex="-1"></div></section>
+
+    <section id="tracker" class="section-tint" aria-labelledby="tracker-heading"><p class="eyebrow">Policy and programme tracker</p><h2 id="tracker-heading">Turn commitments into visible progress</h2><div id="tracker-stats" class="stats" aria-label="Tracker summary"></div><form id="policy-filters" class="filters" role="search"><label>Search policies<input name="query" type="search"></label><label>Country<select name="country"><option>All countries</option></select></label><label>Status<select name="status"><option>All statuses</option></select></label><label>Framework<select name="framework"><option>All frameworks</option></select></label><button class="button button-primary" type="submit">Apply filters</button><button class="button" type="reset">Clear</button></form><p id="policy-count" class="results-count" aria-live="polite"></p><div id="policy-results" class="list-grid"></div></section>
+
+    <section id="knowledge" aria-labelledby="knowledge-heading"><p class="eyebrow">Knowledge Hub</p><h2 id="knowledge-heading">Find accessible, practical resources</h2><form id="resource-filters" class="filters" role="search"><label>Search resources<input name="query" type="search"></label><label>Country<select name="country"><option>All countries</option></select></label><label>Topic<select name="topic"><option>All topics</option></select></label><label>Language<select name="language"><option>All languages</option></select></label><button class="button button-primary" type="submit">Search resources</button><button class="button" type="reset">Clear</button></form><p id="resource-count" class="results-count" aria-live="polite"></p><div id="resource-results" class="list-grid"></div></section>
+
+    <section id="learning" class="section-tint" aria-labelledby="learning-heading"><p class="eyebrow">Learning and professional development</p><h2 id="learning-heading">From evidence to accountable action</h2><div id="learning-content"></div></section>
+
+    <section id="participate" aria-labelledby="participate-heading"><p class="eyebrow">Participation</p><h2 id="participate-heading">Join the SPADRA network</h2><div class="two-column"><form id="join-form" novalidate><div id="join-errors" class="error-summary" tabindex="-1" hidden></div><label>Full name <span aria-hidden="true">*</span><input name="name" autocomplete="name" required></label><label>Email address <span aria-hidden="true">*</span><input name="email" type="email" autocomplete="email" required></label><label>Organisation<input name="organisation" autocomplete="organization"></label><label class="check"><input name="consent" type="checkbox" required> I consent to this simulated form being processed on this device. Nothing will be sent.</label><button class="button button-primary" type="submit">Submit demonstration form</button><p id="join-status" role="status"></p></form><aside class="detail-panel"><h3>Multiple ways to participate</h3><p>Production can support accessible forms, WhatsApp, email, social media and physical address information. This demo does not send messages.</p></aside></div></section>
+
+    <section id="staff" class="section-tint" aria-labelledby="staff-heading"><p class="eyebrow">Simulated staff workspace</p><h2 id="staff-heading">Show how content could be managed</h2><p>This safe demonstration stores changes only in this browser.</p><form id="staff-form" novalidate><div id="staff-errors" class="error-summary" tabindex="-1" hidden></div><label>Resource title<input name="title" required></label><label>Summary<textarea name="summary" rows="3" required></textarea></label><label>Country<select name="country"><option>All countries</option><option>Ghana</option><option>Benin</option><option>Malawi</option><option>Zambia</option></select></label><button class="button button-primary" type="submit">Add demonstration resource</button><p id="staff-status" role="status"></p></form></section>
+
+    <section id="performance" aria-labelledby="performance-heading"><p class="eyebrow">Performance and inclusion</p><h2 id="performance-heading">Designed for constrained connections</h2><div class="card-grid"><article class="card"><h3>Proposed core budget</h3><p class="metric">≤ 500 KB</p><p>Excludes visitor-requested previews.</p></article><article class="card"><h3>Progressive delivery</h3><p>Text and essential controls first; media only when useful or requested.</p></article><article class="card"><h3>Graceful degradation</h3><p>Static values replace animation and essential information remains available.</p></article></div><p class="note">These are proposed design targets. Production results require measurement on ADF-approved hosting, devices and networks.</p></section>
+  </main>
+
+  <footer><p><strong>SPADRA interactive concept demonstration</strong></p><p>Prepared by BeAccessible for discussion with the African Disability Forum.</p><p><a href="#main">Back to top</a></p></footer>
+
+  <dialog id="settings-dialog" aria-labelledby="settings-heading"><form method="dialog"><div class="dialog-header"><h2 id="settings-heading">Accessibility settings</h2><button value="close" class="icon-button" aria-label="Close accessibility settings">×</button></div><label class="check"><input id="low-bandwidth" type="checkbox"> Low-bandwidth mode</label><label class="check"><input id="high-contrast" type="checkbox"> High-contrast display</label><label class="check"><input id="reduced-motion" type="checkbox"> Reduce motion</label><label>Text size<select id="text-scale"><option value="1">Standard</option><option value="1.125">Large</option><option value="1.25">Larger</option></select></label><label>Language preview<select id="language"><option value="en">English</option><option value="fr">Français</option></select></label><button class="button button-primary" value="close">Done</button></form></dialog>
+  <dialog id="walkthrough-dialog" aria-labelledby="walkthrough-title"><div class="dialog-header"><p class="eyebrow">Guided demonstration</p><button id="walkthrough-close" class="icon-button" aria-label="Exit guided demonstration">×</button></div><p id="walkthrough-progress"></p><h2 id="walkthrough-title"></h2><p id="walkthrough-prompt"></p><div class="action-row"><button id="walkthrough-back" class="button">Back</button><button id="walkthrough-show" class="button button-primary">Show feature</button><button id="walkthrough-next" class="button">Next</button></div></dialog>
+  <div id="live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
