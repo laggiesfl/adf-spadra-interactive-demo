@@ -2,7 +2,10 @@ import { DEMO_DATA } from './data.js';
 import { createStore } from './state.js';
 import { filterPolicies, filterResources } from './filters.js';
 import { applyPreferences, bindDialog } from './accessibility.js';
-import { validateJoin, validateStaffRecord, createStaffRecord } from './forms.js';
+import { validateJoin } from './forms.js';
+import { validateResourceMetadata, validateUploadDescriptor, mergeResources } from './resource-contract.js';
+import { createResourceApi } from './resource-api.js';
+import { bindBackToTop } from './back-to-top.js';
 import { gradeKnowledgeCheck } from './learning.js';
 import { t } from './i18n.js';
 import { WALKTHROUGH_STEPS, boundedStep } from './walkthrough.js';
@@ -13,6 +16,9 @@ const store = createStore(localStorage);
 const announce = message => { $('#live-region').textContent = ''; requestAnimationFrame(() => { $('#live-region').textContent = message; }); };
 let policies = [...DEMO_DATA.policies];
 let resources = [...DEMO_DATA.resources];
+let liveResources = [];
+let staffResources = [];
+const resourceApi=createResourceApi();
 
 function values(form) { return Object.fromEntries(new FormData(form).entries()); }
 function clearInvalid(form, summary) { summary.hidden = true; summary.replaceChildren(); form.querySelectorAll('[aria-invalid]').forEach(field => field.removeAttribute('aria-invalid')); }
@@ -59,7 +65,7 @@ function renderStats() {
   const stats = [
     [`${DEMO_DATA.countries.length}`, 'participating countries'],
     [`${policies.length}`, 'illustrative tracker records'],
-    [`${resources.length}`, 'accessible sample resources']
+    [`${resources.length}`, 'visible sample and published resources']
   ];
   $('#tracker-stats').replaceChildren(...stats.map(([value, label]) => { const item = document.createElement('div'); item.className = 'stat'; const strong = document.createElement('strong'); strong.textContent = value; const text = document.createElement('span'); text.textContent = label; item.append(strong, text); return item; }));
 }
@@ -85,11 +91,26 @@ function bindForms() {
     if (!result.valid) return showErrors(summary, form, result.errors);
     form.reset(); $('#join-status').textContent = 'Demonstration complete. Nothing was sent or stored externally.'; announce('Join form demonstration completed safely.');
   });
-  $('#staff-form').addEventListener('submit', event => {
-    event.preventDefault(); const form = event.currentTarget; const summary = $('#staff-errors'); clearInvalid(form, summary); const raw = values(form); const result = validateStaffRecord(raw);
-    if (!result.valid) return showErrors(summary, form, result.errors);
-    const record = createStaffRecord(raw); const edits = [...store.getState().edits, record]; store.update({ edits }); resources = [...DEMO_DATA.resources, ...edits]; initialiseOptions(); renderStats(); renderCurrentResults(); form.reset(); $('#staff-status').textContent = 'Demonstration resource added. It is now visible in the Knowledge Hub.'; announce('Demonstration resource added to the public Knowledge Hub view.');
-  });
+}
+
+async function loadLiveResources(announceResult=false){
+  try{liveResources=await resourceApi.listPublished();resources=mergeResources(DEMO_DATA.resources,liveResources);$('#live-resource-status').textContent=`${liveResources.length} persistent published demonstration resource${liveResources.length===1?'':'s'} loaded.`;initialiseOptions();renderStats();renderCurrentResults();if(announceResult)announce('Published resources refreshed.');}
+  catch{$('#live-resource-status').textContent='Live published resources could not be loaded. The six bundled illustrative resources remain available.';resources=[...DEMO_DATA.resources];initialiseOptions();renderStats();renderCurrentResults();}
+}
+
+function showStaffState(session){const signed=Boolean(session?.authenticated);$('#staff-signed-out').hidden=signed;$('#staff-signed-in').hidden=!signed;if(signed)$('#staff-identity').textContent=`Signed in as ${session.user.name}`;}
+function normaliseStaffForm(form){const raw=values(form);return {...raw,title:raw.title?.trim(),summary:raw.summary?.trim(),accessibility:raw.accessibility?.trim()}}
+function resetStaffForm(){const form=$('#staff-form');form.reset();form.elements.recordId.value='';form.elements.file.required=true;form.querySelector('[type="submit"]').textContent='Upload resource';$('#staff-cancel-edit').hidden=true;}
+function renderStaffResources(){const host=$('#staff-resource-list');if(!staffResources.length){host.textContent='No persistent resources have been created yet.';return}host.replaceChildren(...staffResources.map(record=>{const card=document.createElement('article');const h=document.createElement('h4');h.textContent=record.title;const p=document.createElement('p');p.textContent=`${record.publicationStatus} • ${record.country} • ${record.language}`;const actions=document.createElement('div');actions.className='resource-actions';
+  const edit=document.createElement('button');edit.type='button';edit.className='button';edit.textContent=`Edit ${record.title}`;edit.addEventListener('click',()=>{const form=$('#staff-form');for(const key of ['title','summary','country','topic','language','accessibility','publicationStatus'])if(form.elements[key])form.elements[key].value=record[key]||'';form.elements.recordId.value=record.id;form.elements.file.required=false;form.querySelector('[type="submit"]').textContent='Save resource changes';$('#staff-cancel-edit').hidden=false;form.elements.title.focus()});
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='button';toggle.textContent=record.publicationStatus==='Published'?'Unpublish':'Publish';toggle.addEventListener('click',async()=>{toggle.disabled=true;try{await resourceApi.update(record.id,{...record,publicationStatus:record.publicationStatus==='Published'?'Draft':'Published'});await refreshStaff();await loadLiveResources(true)}catch(e){$('#staff-status').textContent=e.message}finally{toggle.disabled=false}});
+  const del=document.createElement('button');del.type='button';del.className='button';del.textContent=`Delete ${record.title}`;del.addEventListener('click',async()=>{if(!confirm(`Delete “${record.title}”? This cannot be undone.`))return;del.disabled=true;try{await resourceApi.delete(record.id);await refreshStaff();await loadLiveResources(true);$('#staff-status').textContent='Resource deleted.'}catch(e){$('#staff-status').textContent=e.message}finally{del.disabled=false}});actions.append(edit,toggle,del);card.append(h,p,actions);return card}))}
+async function refreshStaff(){staffResources=await resourceApi.listStaff();renderStaffResources()}
+function bindStaff(){
+  $('#staff-login').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button');button.disabled=true;$('#login-status').textContent='Signing in…';try{const data=await resourceApi.login(form.elements.email.value,form.elements.password.value);form.reset();showStaffState({authenticated:true,user:data.user});await refreshStaff();$('#staff-status').textContent='Protected workspace ready.'}catch(e){$('#login-status').textContent=e.message;form.elements.email.focus()}finally{button.disabled=false}});
+  $('#staff-logout').addEventListener('click',async()=>{await resourceApi.logout();showStaffState({authenticated:false});staffResources=[];resetStaffForm();$('#login-status').textContent='Signed out securely.';$('#staff-login').elements.email.focus()});
+  $('#staff-cancel-edit').addEventListener('click',resetStaffForm);
+  $('#staff-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,summary=$('#staff-errors'),button=form.querySelector('[type="submit"]');clearInvalid(form,summary);const raw=normaliseStaffForm(form),meta=validateResourceMetadata(raw);if(!meta.valid)return showErrors(summary,form,meta.errors);const editing=Boolean(raw.recordId);if(!editing){const file=form.elements.file.files[0],check=validateUploadDescriptor(file);if(!check.valid)return showErrors(summary,form,{file:check.error})}button.disabled=true;$('#staff-status').textContent=editing?'Saving changes…':'Uploading and saving the resource…';try{if(editing)await resourceApi.update(raw.recordId,raw);else await resourceApi.create(form);resetStaffForm();await refreshStaff();await loadLiveResources(true);$('#staff-status').textContent=editing?'Resource changes saved.':'Resource uploaded and stored online.'}catch(e){$('#staff-status').textContent=e.message}finally{button.disabled=false}});
 }
 
 function bindSettings() {
@@ -112,11 +133,13 @@ function bindWalkthrough() {
 
 function initialise() {
   renderCountries($('#country-grid'), $('#country-detail'), DEMO_DATA.countries);
-  policies = [...DEMO_DATA.policies]; resources = [...DEMO_DATA.resources, ...store.getState().edits]; initialiseOptions(); renderStats(); renderLearning(); renderCurrentResults();
-  bindFilters($('#policy-filters')); bindFilters($('#resource-filters')); bindForms(); bindSettings(); bindWalkthrough();
+  policies = [...DEMO_DATA.policies]; resources = [...DEMO_DATA.resources]; initialiseOptions(); renderStats(); renderLearning(); renderCurrentResults();
+  bindFilters($('#policy-filters')); bindFilters($('#resource-filters')); bindForms(); bindSettings(); bindWalkthrough(); bindStaff();bindBackToTop($('#back-to-top'),$('#page-start'));
   $('#menu-button').addEventListener('click', event => { const nav = $('#primary-nav'); const open = nav.dataset.open !== 'true'; nav.dataset.open = String(open); event.currentTarget.setAttribute('aria-expanded', String(open)); });
-  $('#reset-demo').addEventListener('click', () => { if (!confirm('Reset all demonstration data and display preferences?')) return; store.reset(); policies = [...DEMO_DATA.policies]; resources = [...DEMO_DATA.resources]; initialiseOptions(); renderStats(); renderLearning(); syncPreferences(store.getState(), true); $('#staff-status').textContent = 'Demonstration restored to its original state.'; $('#walkthrough-open').textContent = 'Start guided demonstration'; });
+  $('#reset-demo').addEventListener('click', () => { if (!confirm('Reset display preferences and browser-only learning progress? Persistent resources will not be deleted.')) return; store.reset(); policies = [...DEMO_DATA.policies]; resources = mergeResources(DEMO_DATA.resources,liveResources); initialiseOptions(); renderStats(); renderLearning(); syncPreferences(store.getState(), true); $('#staff-status').textContent = 'Browser-only preferences and learning progress reset. Persistent resources were preserved.'; $('#walkthrough-open').textContent = 'Start guided demonstration'; });
   syncPreferences(store.getState());
+  resourceApi.session().then(async session=>{showStaffState(session);if(session.authenticated)await refreshStaff()}).catch(()=>showStaffState({authenticated:false}));loadLiveResources();
 }
 
 initialise();
+

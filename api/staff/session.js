@@ -1,0 +1,2 @@
+import { readSessionCookie,verifySessionCookie } from '../_lib/session.js'; import { json,method } from '../_lib/http.js';
+export default async function handler(req,res,deps={}){if(!method(req,res,['GET']))return;const env=deps.env||process.env;const user=await verifySessionCookie(readSessionCookie(req),env.SESSION_SECRET);return json(res,200,user?{authenticated:true,user:{name:user.name,email:user.email}}:{authenticated:false});}

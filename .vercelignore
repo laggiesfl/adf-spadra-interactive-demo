@@ -1,0 +1,9 @@
+node_modules
+tests
+scripts
+.netlify
+.netlify-config
+netlify.toml
+package-lock.json
+browser-home.png
+verification-report.md

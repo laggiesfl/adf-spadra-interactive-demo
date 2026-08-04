@@ -1,0 +1,3 @@
+import { readSessionCookie,verifySessionCookie } from './session.js';
+export const staffSession=(req,env=process.env)=>verifySessionCookie(readSessionCookie(req),env.SESSION_SECRET);
+export function toAirtableFields(v,user){return {Title:String(v.title).trim(),Summary:String(v.summary).trim(),Country:v.country,Topic:v.topic,Language:v.language,'Accessibility notes':String(v.accessibility).trim(),'Publication status':v.publicationStatus==='Published'?'Published':'Draft','Content label':'Published demonstration resource','Created by':user.name,...(v.publicationStatus==='Published'?{'Published at':new Date().toISOString()}:{})}}
