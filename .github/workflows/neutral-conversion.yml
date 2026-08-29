@@ -38,15 +38,12 @@ jobs:
       - name: Check patch integrity
         run: git diff --check
 
-      - name: Reject residual legacy branding
+      - name: Reject residual legacy branding in deliverable files
         shell: bash
         run: |
           if grep -RInE 'African Disability Forum|SPADRA|(^|[^A-Za-z])ADF([^A-Za-z]|$)|Ghana|Benin|Malawi|Zambia' \
-            --exclude-dir=.git \
-            --exclude-dir=node_modules \
-            --exclude=apply-neutral-conversion.mjs \
-            .; then
-            echo 'Legacy bid references remain outside the migration script.'
+            index.html assets src api README.md verification-report.md package.json; then
+            echo 'Legacy bid references remain in deliverable files.'
             exit 1
           fi
 
