@@ -20,7 +20,7 @@ export function createStaffRecord(values, now = Date.now) {
     id: `staff-${now()}`,
     title: String(values.title).trim(),
     summary: String(values.summary).trim(),
-    country: values.country || 'All countries',
+    country: values.country || 'All regions',
     topic: 'Community resource',
     language: 'English',
     format: 'Resource',

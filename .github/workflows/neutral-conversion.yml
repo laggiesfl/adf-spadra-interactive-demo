@@ -1,0 +1,61 @@
+name: Neutral conversion verification
+
+on:
+  push:
+    branches:
+      - accessible-member-network-conversion
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: accessible-member-network-conversion
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Apply deterministic neutral conversion
+        run: node scripts/apply-neutral-conversion.mjs
+
+      - name: Install runtime dependencies
+        run: npm install --omit=dev --no-audit --no-fund
+
+      - name: Run automated tests
+        run: npm test
+
+      - name: Check performance budget
+        run: npm run check:budget
+
+      - name: Check patch integrity
+        run: git diff --check
+
+      - name: Reject residual legacy branding in deliverable files
+        shell: bash
+        run: |
+          if grep -RInE 'African Disability Forum|SPADRA|(^|[^A-Za-z])ADF([^A-Za-z]|$)|Ghana|Benin|Malawi|Zambia' \
+            index.html assets src api README.md verification-report.md package.json; then
+            echo 'Legacy bid references remain in deliverable files.'
+            exit 1
+          fi
+
+      - name: Commit verified conversion
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src tests README.md verification-report.md package.json
+          if git diff --cached --quiet; then
+            echo 'No verified conversion changes to commit.'
+          else
+            git commit -m 'Complete Accessible Member Network conversion'
+            git push origin HEAD:accessible-member-network-conversion
+          fi

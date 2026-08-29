@@ -38,7 +38,7 @@ test('subscribers receive a cloned state after an update', () => {
 });
 
 test('malformed stored JSON falls back to defaults', () => {
-  const store = createStore(memoryStorage({ 'spadra-demo-state-v1': '{bad' }));
+  const store = createStore(memoryStorage({ 'accessible-member-network-demo-state-v1': '{bad' }));
   assert.deepEqual(store.getState(), DEFAULT_STATE);
 });
 

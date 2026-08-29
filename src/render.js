@@ -13,7 +13,7 @@ export function renderCountries(container, detail, countries) {
     progress.setAttribute('role', 'progressbar'); progress.setAttribute('aria-label', `${country.name} illustrative progress`); progress.setAttribute('aria-valuenow', country.progress); progress.setAttribute('aria-valuemin', '0'); progress.setAttribute('aria-valuemax', '100');
     const fill = element('span'); fill.style.width = `${country.progress}%`; progress.append(fill); card.append(progress);
     const button = element('button', 'button', `Explore ${country.name}`); button.addEventListener('click', () => {
-      detail.replaceChildren(element('h3', '', `${country.name}: illustrative country view`), element('p', '', country.summary), element('p', '', `${country.milestones} milestones recorded • ${country.progress}% illustrative progress`), element('p', 'note', 'This sample demonstrates the proposed information structure. ADF-approved evidence would replace these records in production.'));
+      detail.replaceChildren(element('h3', '', `${country.name}: illustrative member-region view`), element('p', '', country.summary), element('p', '', `${country.milestones} milestones recorded • ${country.progress}% illustrative progress`), element('p', 'note', 'This sample demonstrates the proposed information structure. Client-approved evidence would replace these fictional records in production.'));
       detail.focus();
     }); card.append(button); return card;
   }));
@@ -45,7 +45,7 @@ export function renderResources(container, records, lowBandwidth = false) {
       const link=element('a','button',`Download ${record.title}`); link.href=record.downloadUrl; card.append(meta,link);
     } else {
       const button = element('button', 'text-button', 'View lightweight preview');
-      button.addEventListener('click', () => { button.insertAdjacentElement('afterend', element('div', 'resource-preview', 'Text-first illustrative preview loaded on request. No official ADF file is attached to this sample record.')); button.remove(); });
+      button.addEventListener('click', () => { button.insertAdjacentElement('afterend', element('div', 'resource-preview', 'Text-first illustrative preview loaded on request. No real organisation file is attached to this fictional sample record.')); button.remove(); });
       card.append(button);
     }
     return card;

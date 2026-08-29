@@ -28,7 +28,7 @@ export function validateUploadDescriptor(file={}) {
 export function mapAirtableRecord(record) {
   const f=record?.fields||{}; const a=Array.isArray(f.Attachment)?f.Attachment[0]:null;
   const date=f['Updated at']?new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(f['Updated at'])):'';
-  return {id:record.id,title:f.Title||'',summary:f.Summary||'',country:f.Country||'All countries',topic:f.Topic||'Resource',language:f.Language||'English',format:(a?.filename?.split('.').pop()||'File').toUpperCase(),accessibility:f['Accessibility notes']||'Accessibility information not supplied.',fileName:a?.filename||'',fileSize:a?.size||0,downloadUrl:`/api/resources/${encodeURIComponent(record.id)}/download`,publicationStatus:f['Publication status']||'Draft',updated:date,demonstration:true,persistent:true};
+  return {id:record.id,title:f.Title||'',summary:f.Summary||'',country:f.Country||'All regions',topic:f.Topic||'Resource',language:f.Language||'English',format:(a?.filename?.split('.').pop()||'File').toUpperCase(),accessibility:f['Accessibility notes']||'Accessibility information not supplied.',fileName:a?.filename||'',fileSize:a?.size||0,downloadUrl:`/api/resources/${encodeURIComponent(record.id)}/download`,publicationStatus:f['Publication status']||'Draft',updated:date,demonstration:true,persistent:true};
 }
 
 export function mergeResources(bundled=[],live=[]) {

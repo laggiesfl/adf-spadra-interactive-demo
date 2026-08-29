@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'spadra-demo-state-v1';
+const STORAGE_KEY = 'accessible-member-network-demo-state-v1';
 
 export const DEFAULT_STATE = Object.freeze({
   language: 'en',

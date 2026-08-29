@@ -1,5 +1,5 @@
 {
-  "name": "adf-spadra-interactive-demo",
+  "name": "accessible-member-network-platform",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -16,4 +16,3 @@
     "busboy": "1.6.0"
   }
 }
-
