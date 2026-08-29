@@ -41,11 +41,11 @@ function syncPreferences(state, shouldAnnounce = false) {
 
 function initialiseOptions() {
   const pf = $('#policy-filters');
-  setOptions(pf.elements.country, policies.map(x => x.country), 'All countries');
+  setOptions(pf.elements.country, policies.map(x => x.country), 'All regions');
   setOptions(pf.elements.status, policies.map(x => x.status), 'All statuses');
   setOptions(pf.elements.framework, policies.map(x => x.framework), 'All frameworks');
   const rf = $('#resource-filters');
-  setOptions(rf.elements.country, resources.map(x => x.country), 'All countries');
+  setOptions(rf.elements.country, resources.map(x => x.country), 'All regions');
   setOptions(rf.elements.topic, resources.map(x => x.topic), 'All topics');
   setOptions(rf.elements.language, resources.map(x => x.language), 'All languages');
 }
@@ -64,7 +64,7 @@ function renderCurrentResults() {
 
 function renderStats() {
   const stats = [
-    [`${DEMO_DATA.countries.length}`, 'participating countries'],
+    [`${DEMO_DATA.countries.length}`, 'fictional regional members'],
     [`${policies.length}`, 'illustrative tracker records'],
     [`${resources.length}`, 'visible sample and published resources']
   ];
@@ -118,7 +118,7 @@ function bindSettings() {
   bindDialog($('#settings-dialog'), $('#settings-open'));
   ['low-bandwidth','high-contrast','reduced-motion'].forEach(id => $(`#${id}`).addEventListener('change', event => { const key = id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()); store.update({ [key]: event.target.checked }); syncPreferences(store.getState(), true); }));
   $('#text-scale').addEventListener('change', event => { store.update({ textScale: Number(event.target.value) }); syncPreferences(store.getState(), true); });
-  $('#language').addEventListener('change', event => { store.update({ language: event.target.value }); syncPreferences(store.getState(), true); document.querySelectorAll('.french-note').forEach(x => x.remove()); if (event.target.value === 'fr') { const note = document.createElement('p'); note.className = 'french-note'; note.textContent = 'Aperçu français illustratif — la production nécessitera une traduction professionnelle approuvée par ADF.'; $('#overview').prepend(note); } });
+  $('#language').addEventListener('change', event => { store.update({ language: event.target.value }); syncPreferences(store.getState(), true); document.querySelectorAll('.french-note').forEach(x => x.remove()); if (event.target.value === 'fr') { const note = document.createElement('p'); note.className = 'french-note'; note.textContent = 'Aperçu français illustratif — une production réelle nécessiterait une traduction professionnelle approuvée par l’organisation utilisatrice.'; $('#overview').prepend(note); } });
   $('#bandwidth-quick').addEventListener('click', () => { store.update({ lowBandwidth: !store.getState().lowBandwidth }); syncPreferences(store.getState(), true); });
 }
 

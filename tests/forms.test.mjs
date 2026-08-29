@@ -17,7 +17,7 @@ test('staff record requires a useful title and summary', () => {
 });
 
 test('created staff record is explicitly illustrative', () => {
-  const record = createStaffRecord({ title: 'New guide', summary: 'A sufficiently useful demonstration summary.', country: 'Ghana' }, () => 42);
+  const record = createStaffRecord({ title: 'New guide', summary: 'A sufficiently useful demonstration summary.', country: 'North Coast Region' }, () => 42);
   assert.equal(record.id, 'staff-42');
   assert.equal(record.demonstration, true);
   assert.equal(record.language, 'English');
