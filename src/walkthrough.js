@@ -5,7 +5,7 @@ export const WALKTHROUGH_STEPS = Object.freeze([
   { title: 'Knowledge sharing', prompt: 'Search accessible resources by region, topic and language.', targetId: 'knowledge' },
   { title: 'Learning in the platform', prompt: 'Complete the short knowledge check and show browser-based progress.', targetId: 'learning' },
   { title: 'Low-bandwidth inclusion', prompt: 'Switch modes and explain text-first delivery, static counters and deferred previews.', targetId: 'performance' },
-  { title: 'Staff and accessibility', prompt: 'Add a sample resource, then show accessibility settings and the one-click reset.', targetId: 'staff' }
+  { title: 'Staff and accessibility', prompt: 'Explain the protected publishing workspace (BeAccessible sign-in required), then show the accessibility settings and the reset button for display and learning settings.', targetId: 'staff' }
 ]);
 
 export const boundedStep = index => Math.max(0, Math.min(WALKTHROUGH_STEPS.length - 1, Number(index) || 0));

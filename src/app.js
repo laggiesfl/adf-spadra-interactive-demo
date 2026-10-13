@@ -8,7 +8,7 @@ import { createResourceApi } from './resource-api.js';
 import { bindBackToTop } from './back-to-top.js';
 import { navigateToHash } from './hash-navigation.js';
 import { gradeKnowledgeCheck } from './learning.js';
-import { t } from './i18n.js';
+import { t, applyTranslations } from './i18n.js';
 import { WALKTHROUGH_STEPS, boundedStep } from './walkthrough.js';
 import { renderCountries, renderPolicies, renderResources, setOptions, showErrors } from './render.js';
 
@@ -31,9 +31,12 @@ function syncPreferences(state, shouldAnnounce = false) {
   $('#reduced-motion').checked = applied.reducedMotion;
   $('#text-scale').value = String(applied.textScale);
   $('#language').value = applied.language;
+  applyTranslations(document, applied.language);
+  document.querySelectorAll('.french-note').forEach(x => x.remove());
+  if (applied.language === 'fr') { const note = document.createElement('p'); note.className = 'french-note'; note.lang = 'fr'; note.textContent = 'Aperçu français partiel : seuls la navigation et les titres sont traduits. Une version réelle nécessiterait une traduction professionnelle approuvée par l’organisation utilisatrice.'; $('#overview').prepend(note); }
   $('#bandwidth-quick').textContent = applied.lowBandwidth ? 'Turn off low-bandwidth mode' : 'Turn on low-bandwidth mode';
   let banner = $('#mode-banner');
-  if (applied.lowBandwidth && !banner) { banner = document.createElement('div'); banner.id = 'mode-banner'; banner.className = 'mode-banner'; banner.textContent = 'Low-bandwidth mode active — essential content and controls are prioritised.'; document.body.prepend(banner); }
+  if (applied.lowBandwidth && !banner) { banner = document.createElement('aside'); banner.setAttribute('aria-label', 'Low-bandwidth mode notice'); banner.id = 'mode-banner'; banner.className = 'mode-banner'; banner.textContent = 'Low-bandwidth mode active — essential content and controls are prioritised.'; document.body.prepend(banner); }
   if (!applied.lowBandwidth) banner?.remove();
   renderCurrentResults();
   if (shouldAnnounce) announce(`Display preferences updated. Low-bandwidth mode ${applied.lowBandwidth ? 'on' : 'off'}.`);
@@ -95,7 +98,7 @@ function bindForms() {
 }
 
 async function loadLiveResources(announceResult=false){
-  try{liveResources=await resourceApi.listPublished();resources=mergeResources(DEMO_DATA.resources,liveResources);$('#live-resource-status').textContent=`${liveResources.length} persistent published demonstration resource${liveResources.length===1?'':'s'} loaded.`;initialiseOptions();renderStats();renderCurrentResults();if(announceResult)announce('Published resources refreshed.');}
+  try{liveResources=await resourceApi.listPublished();resources=mergeResources(DEMO_DATA.resources,liveResources);$('#live-resource-status').textContent=liveResources.length?`${liveResources.length} resource${liveResources.length===1?' has':'s have'} been published through the protected workspace and ${liveResources.length===1?'is':'are'} shown first, followed by the six illustrative samples.`:'No resources are published through the protected workspace at the moment, so only the six illustrative samples are shown.';initialiseOptions();renderStats();renderCurrentResults();if(announceResult)announce('Published resources refreshed.');}
   catch{$('#live-resource-status').textContent='Live published resources could not be loaded. The six bundled illustrative resources remain available.';resources=[...DEMO_DATA.resources];initialiseOptions();renderStats();renderCurrentResults();}
 }
 
@@ -118,7 +121,7 @@ function bindSettings() {
   bindDialog($('#settings-dialog'), $('#settings-open'));
   ['low-bandwidth','high-contrast','reduced-motion'].forEach(id => $(`#${id}`).addEventListener('change', event => { const key = id.replace(/-([a-z])/g, (_, c) => c.toUpperCase()); store.update({ [key]: event.target.checked }); syncPreferences(store.getState(), true); }));
   $('#text-scale').addEventListener('change', event => { store.update({ textScale: Number(event.target.value) }); syncPreferences(store.getState(), true); });
-  $('#language').addEventListener('change', event => { store.update({ language: event.target.value }); syncPreferences(store.getState(), true); document.querySelectorAll('.french-note').forEach(x => x.remove()); if (event.target.value === 'fr') { const note = document.createElement('p'); note.className = 'french-note'; note.textContent = 'Aperçu français illustratif — une production réelle nécessiterait une traduction professionnelle approuvée par l’organisation utilisatrice.'; $('#overview').prepend(note); } });
+  $('#language').addEventListener('change', event => { store.update({ language: event.target.value }); syncPreferences(store.getState(), false); announce(event.target.value === 'fr' ? 'Partial French preview on. Navigation and headings are in French; other content stays in English.' : 'English interface restored.'); });
   $('#bandwidth-quick').addEventListener('click', () => { store.update({ lowBandwidth: !store.getState().lowBandwidth }); syncPreferences(store.getState(), true); });
 }
 
@@ -137,7 +140,7 @@ function initialise() {
   policies = [...DEMO_DATA.policies]; resources = [...DEMO_DATA.resources]; initialiseOptions(); renderStats(); renderLearning(); renderCurrentResults();
   bindFilters($('#policy-filters')); bindFilters($('#resource-filters')); bindForms(); bindSettings(); bindWalkthrough(); bindStaff();bindBackToTop($('#back-to-top'),$('#page-start'));
   $('#menu-button').addEventListener('click', event => { const nav = $('#primary-nav'); const open = nav.dataset.open !== 'true'; nav.dataset.open = String(open); event.currentTarget.setAttribute('aria-expanded', String(open)); });
-  $('#reset-demo').addEventListener('click', () => { if (!confirm('Reset display preferences and browser-only learning progress? Persistent resources will not be deleted.')) return; store.reset(); policies = [...DEMO_DATA.policies]; resources = mergeResources(DEMO_DATA.resources,liveResources); initialiseOptions(); renderStats(); renderLearning(); syncPreferences(store.getState(), true); $('#staff-status').textContent = 'Browser-only preferences and learning progress reset. Persistent resources were preserved.'; $('#walkthrough-open').textContent = 'Start guided demonstration'; });
+  $('#reset-demo').addEventListener('click', () => { if (!confirm('Reset your display settings, language, learning progress and guided-demonstration position in this browser? Published resources are not affected.')) return; store.reset(); policies = [...DEMO_DATA.policies]; resources = mergeResources(DEMO_DATA.resources,liveResources); initialiseOptions(); renderStats(); renderLearning(); syncPreferences(store.getState(), true); $('#reset-status').textContent = 'Your display settings, language and learning progress have been reset in this browser. Published resources were not changed.'; $('#walkthrough-open').textContent = 'Start guided demonstration'; });
   syncPreferences(store.getState());
   resourceApi.session().then(async session=>{showStaffState(session);if(session.authenticated)await refreshStaff()}).catch(()=>showStaffState({authenticated:false}));loadLiveResources();
   requestAnimationFrame(() => requestAnimationFrame(() => navigateToHash(document, location.hash)));

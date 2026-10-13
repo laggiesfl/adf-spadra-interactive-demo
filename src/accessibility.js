@@ -12,7 +12,7 @@ export function normalisePreferences(input = {}) {
 
 export function applyPreferences(root, input) {
   const p = normalisePreferences(input);
-  root.lang = p.language;
+  root.lang = 'en'; // body content is always English; translated elements carry their own lang
   root.dataset.language = p.language;
   root.dataset.lowBandwidth = String(p.lowBandwidth);
   root.dataset.highContrast = String(p.highContrast);

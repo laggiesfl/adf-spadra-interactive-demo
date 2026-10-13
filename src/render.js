@@ -12,12 +12,14 @@ export function renderCountries(container, detail, countries) {
     const progress = element('div', 'progress');
     progress.setAttribute('role', 'progressbar'); progress.setAttribute('aria-label', `${country.name} illustrative progress`); progress.setAttribute('aria-valuenow', country.progress); progress.setAttribute('aria-valuemin', '0'); progress.setAttribute('aria-valuemax', '100');
     const fill = element('span'); fill.style.width = `${country.progress}%`; progress.append(fill); card.append(progress);
-    const button = element('button', 'button', `Explore ${country.name}`); button.addEventListener('click', () => {
-      detail.replaceChildren(element('h3', '', `${country.name}: illustrative member-region view`), element('p', '', country.summary), element('p', '', `${country.milestones} milestones recorded • ${country.progress}% illustrative progress`), element('p', 'note', 'This sample demonstrates the proposed information structure. Client-approved evidence would replace these fictional records in production.'));
-      detail.focus();
-    }); card.append(button); return card;
+    const button = element('button', 'button', `Explore ${country.name}`); button.addEventListener('click', () => { showDetail(country); detail.focus(); });
+    card.append(button); return card;
   }));
-  countries[0] && container.querySelector('button')?.click();
+  // Show the first region without moving focus or scrolling the page on load.
+  if (countries[0]) showDetail(countries[0]);
+  function showDetail(country) {
+    detail.replaceChildren(element('h3', '', `${country.name}: illustrative member-region view`), element('p', '', country.summary), element('p', '', `${country.milestones} milestones recorded • ${country.progress}% illustrative progress`), element('p', 'note', 'This sample demonstrates the proposed information structure. Client-approved evidence would replace these fictional records in production.'));
+  }
 }
 
 export function renderPolicies(container, records, lowBandwidth = false) {

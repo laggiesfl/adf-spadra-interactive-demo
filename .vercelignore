@@ -1,6 +1,9 @@
 node_modules
 tests
 scripts
+.github
+.env.example
+README.md
 .netlify
 .netlify-config
 netlify.toml
